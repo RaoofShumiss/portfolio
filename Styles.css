@@ -133,6 +133,83 @@ button:focus-visible {
     margin-bottom: 12px;
 }
 
+/* Toegankelijk contactformulier */
+#contact-form {
+    max-width: 640px;
+    margin-top: 20px;
+}
+
+#contact-form fieldset {
+    border: 0;
+    min-width: 0;
+}
+
+#contact-form legend {
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.form-field {
+    margin-bottom: 20px;
+}
+
+.form-field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.form-field input,
+.form-field textarea {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #596566;
+    border-radius: 4px;
+    font: inherit;
+    color: inherit;
+    background-color: #fff;
+}
+
+.form-field textarea {
+    resize: vertical;
+}
+
+.form-field input:focus-visible,
+.form-field textarea:focus-visible {
+    outline: 3px solid #2874a6;
+    outline-offset: 3px;
+}
+
+.form-field [aria-invalid="true"] {
+    border: 2px solid #a32020;
+}
+
+.field-error,
+.form-status-error {
+    color: #a32020;
+}
+
+.field-error {
+    margin-top: 6px;
+}
+
+#message-hint {
+    color: #596566;
+}
+
+#contact-status:not(:empty) {
+    margin-top: 16px;
+    padding: 12px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+}
+
+.form-status-success {
+    color: #216339;
+    background-color: #eff8f1;
+}
+
 /* Footer */
 footer {
     background-color: #2c3e50;

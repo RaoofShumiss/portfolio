@@ -55,3 +55,69 @@ document.querySelectorAll('[data-blog] article').forEach((article, index) => {
 
     content.before(button);
 });
+
+// Controleer alle contactvelden voordat het formulier wordt bevestigd.
+const contactForm = document.querySelector('#contact-form');
+
+if (contactForm) {
+    const nameInput = document.querySelector('#contact-name');
+    const emailInput = document.querySelector('#contact-email');
+    const messageInput = document.querySelector('#contact-message');
+    const status = document.querySelector('#contact-status');
+    const fields = [nameInput, emailInput, messageInput];
+    let submitted = false;
+
+    function validateField(field) {
+        const value = field.value.trim();
+        let error = '';
+
+        if (field === nameInput && !value) {
+            error = 'Vul je naam in. Alleen spaties zijn niet voldoende.';
+        } else if (field === emailInput) {
+            if (!value) {
+                error = 'Vul je e-mailadres in.';
+            } else if (field.validity.typeMismatch || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                error = 'Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.';
+            }
+        } else if (field === messageInput && value.length < 10) {
+            error = 'Schrijf een bericht van minimaal 10 tekens (zonder spaties aan het begin en einde).';
+        }
+
+        const errorElement = document.getElementById(`${field.name}-error`);
+        errorElement.textContent = error;
+        errorElement.hidden = !error;
+        field.setAttribute('aria-invalid', String(Boolean(error)));
+        return !error;
+    }
+
+    contactForm.addEventListener('submit', (event) => {
+        // Geen server gekoppeld: voorkom navigatie en verstuur geen gegevens.
+        event.preventDefault();
+        submitted = true;
+        const invalidFields = fields.filter((field) => !validateField(field));
+
+        if (invalidFields.length) {
+            status.className = 'form-status-error';
+            status.textContent = `Controleer de ${invalidFields.length} gemarkeerde velden. Je bericht is niet verstuurd.`;
+            invalidFields[0].focus();
+            return;
+        }
+
+        status.className = 'form-status-success';
+        status.textContent = 'Bedankt! Alle velden zijn correct ingevuld.';
+        contactForm.reset();
+        submitted = false;
+        fields.forEach((field) => field.removeAttribute('aria-invalid'));
+    });
+
+    fields.forEach((field) => {
+        field.addEventListener('input', () => {
+            status.textContent = '';
+            status.className = '';
+            if (submitted) validateField(field);
+        });
+    });
+
+    // Activeer het formulier pas nadat de validatie is gekoppeld.
+    contactForm.querySelector('fieldset').disabled = false;
+}
