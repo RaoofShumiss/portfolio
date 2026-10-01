@@ -1,24 +1,67 @@
-// Filter projecten en werk het aantal zichtbare resultaten bij.
-const filters = document.querySelector('.project-filters');
+// Gestructureerde databron: de projectkaarten worden uit deze array opgebouwd.
+const projects = [
+    {
+        id: 'hotel-simulatie',
+        title: 'Hotel Simulatie Systeem',
+        description: 'Een Java applicatie voor het simuleren van hotel operaties met gasten, liften en verschillende faciliteiten.',
+        category: 'java',
+        technologies: ['Java', 'Object-georiënteerd programmeren']
+    },
+    {
+        id: 'portfolio-website',
+        title: 'Portfolio Website',
+        description: 'Een responsieve portfolio website gebouwd met HTML5 en CSS3.',
+        category: 'web',
+        technologies: ['HTML5', 'CSS3', 'Responsive Design']
+    }
+];
 
-if (filters) {
+// Filter de gegevens en render de bijbehorende kaarten en het aantal resultaten.
+const filters = document.querySelector('.project-filters');
+const projectList = document.querySelector('#project-list');
+
+if (filters && projectList) {
     const buttons = filters.querySelectorAll('[data-filter]');
-    const projects = document.querySelectorAll('article[data-category]');
     const count = document.querySelector('#project-count');
 
     function filterProjects(category) {
-        let visibleCount = 0;
+        const visibleProjects = projects.filter((project) =>
+            category === 'all' || project.category === category
+        );
 
-        projects.forEach((project) => {
-            project.hidden = category !== 'all' && project.dataset.category !== category;
-            if (!project.hidden) visibleCount += 1;
+        const cards = visibleProjects.map((project) => {
+            const article = document.createElement('article');
+            article.dataset.projectId = project.id;
+            article.dataset.category = project.category;
+
+            const title = document.createElement('h3');
+            title.textContent = project.title;
+
+            const description = document.createElement('p');
+            description.textContent = project.description;
+
+            const technologies = document.createElement('p');
+            const label = document.createElement('strong');
+            label.textContent = 'Technologieën:';
+            technologies.append(label, ` ${project.technologies.join(', ')}`);
+
+            article.append(title, description, technologies);
+            return article;
         });
+
+        projectList.replaceChildren(...cards);
+
+        if (visibleProjects.length === 0) {
+            const emptyMessage = document.createElement('p');
+            emptyMessage.textContent = 'Geen projecten gevonden voor deze categorie.';
+            projectList.append(emptyMessage);
+        }
 
         buttons.forEach((button) => {
             button.setAttribute('aria-pressed', String(button.dataset.filter === category));
         });
 
-        count.textContent = `${visibleCount} van ${projects.length} projecten zichtbaar`;
+        count.textContent = `${visibleProjects.length} van ${projects.length} projecten zichtbaar`;
     }
 
     buttons.forEach((button) => {
