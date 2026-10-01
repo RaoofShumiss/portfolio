@@ -88,6 +88,51 @@ article time {
     font-style: italic;
 }
 
+/* JavaScript-interacties */
+[hidden] {
+    display: none !important;
+}
+
+.project-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+button {
+    font: inherit;
+    color: #2c3e50;
+    background-color: #fff;
+    border: 1px solid #34495e;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e8edf2;
+}
+
+button[aria-pressed="true"] {
+    color: #fff;
+    background-color: #34495e;
+}
+
+button:focus-visible {
+    outline: 3px solid #2874a6;
+    outline-offset: 3px;
+}
+
+#project-count {
+    color: #596566;
+    margin-bottom: 24px;
+}
+
+.blog-toggle {
+    margin-bottom: 12px;
+}
+
 /* Footer */
 footer {
     background-color: #2c3e50;

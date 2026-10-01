@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projecten</title>
     <link rel="stylesheet" href="Styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
     <header>
@@ -20,14 +21,20 @@
      <main>
         <section>
             <h2>Mijn Projecten</h2>
+            <div class="project-filters" role="group" aria-label="Filter projecten op technologie" hidden>
+                <button type="button" data-filter="all" aria-pressed="true">Alle projecten</button>
+                <button type="button" data-filter="java" aria-pressed="false">Java</button>
+                <button type="button" data-filter="web" aria-pressed="false">HTML &amp; CSS</button>
+            </div>
+            <p id="project-count" role="status" hidden></p>
             
-            <article>
+            <article data-category="java">
                 <h3>Hotel Simulatie Systeem</h3>
                 <p>Een Java applicatie voor het simuleren van hotel operaties met gasten, liften en verschillende faciliteiten.</p>
                 <p><strong>Technologieën:</strong> Java, Object-georiënteerd programmeren</p>
             </article>
             
-            <article>
+            <article data-category="web">
                 <h3>Portfolio Website</h3>
                 <p>Een responsieve portfolio website gebouwd met HTML5 en CSS3.</p>
                 <p><strong>Technologieën:</strong> HTML5, CSS3, Responsive Design</p>
