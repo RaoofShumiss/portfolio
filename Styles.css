@@ -210,6 +210,109 @@ button:focus-visible {
     background-color: #eff8f1;
 }
 
+/* Actuele temperatuur */
+.weather-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 24px;
+    padding: 28px 32px;
+    color: #fff;
+    background: linear-gradient(120deg, #243647, #36586b);
+    border: 1px solid #456779;
+    border-radius: 16px;
+}
+
+.weather-location {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.weather-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    color: #bdeee6;
+    background: rgba(189, 238, 230, 0.1);
+    border: 1px solid rgba(189, 238, 230, 0.25);
+    border-radius: 16px;
+}
+
+.weather-label {
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #bdeee6;
+}
+
+.weather-card h2 {
+    margin: 2px 0;
+    font-size: 28px;
+    color: #fff;
+}
+
+.weather-reading {
+    max-width: 360px;
+}
+
+#weather-status {
+    line-height: 1.5;
+    color: #e0eaf1;
+}
+
+#weather-status[data-state="success"] {
+    font-size: clamp(40px, 6vw, 56px);
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    color: #fff;
+}
+
+#weather-status[data-state="error"] {
+    color: #ffdbce;
+}
+
+.weather-source {
+    font-size: 12px;
+    color: #ccdce6;
+}
+
+.weather-source a {
+    color: inherit;
+    text-underline-offset: 3px;
+}
+
+.weather-source a:hover {
+    color: #fff;
+}
+
+#weather-retry {
+    margin-top: 12px;
+    color: #fff;
+    background: transparent;
+    border-color: #a9c6d6;
+}
+
+#weather-retry:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.weather-card :focus-visible {
+    outline: 3px solid #bdeee6;
+    outline-offset: 4px;
+}
+
+#weather-retry:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
 /* Footer */
 footer {
     background-color: #2c3e50;
@@ -219,6 +322,21 @@ footer {
 
 /* Mobiel (<= 480px) */
 @media (max-width: 480px) {
+    .weather-card {
+        padding: 24px;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .weather-location {
+        gap: 12px;
+    }
+
+    .weather-reading {
+        max-width: 100%;
+    }
+
     header h1 {
         font-size: 22.4px;
     }

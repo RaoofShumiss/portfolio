@@ -6,6 +6,7 @@
     <title>Whoami</title>
     <link rel="stylesheet" href="Styles.css">
     <script src="script.js" defer></script>
+    <script src="weather.js" defer></script>
 </head>
 <body>
     <header>
@@ -58,8 +59,27 @@
                     </fieldset>
                     <p id="contact-status" role="status" aria-live="polite" aria-atomic="true"></p>
                 </form>
-                <noscript><p>Schakel JavaScript in om het contactformulier te gebruiken.</p></noscript>
             </article>
+        </section>
+        <section class="weather-card" aria-labelledby="weather-title">
+            <div class="weather-location">
+                <span class="weather-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 14.8V5a3 3 0 0 1 6 0v9.8a5 5 0 1 1-6 0Z" />
+                        <path d="M12 8v9" />
+                        <circle cx="12" cy="18" r="1.5" fill="currentColor" stroke="none" />
+                    </svg>
+                </span>
+                <div>
+                    <p class="weather-label">Actuele temperatuur</p>
+                    <h2 id="weather-title">Jouw locatie</h2>
+                    <p class="weather-source">Weergegevens van <a href="https://open-meteo.com/">Open-Meteo</a></p>
+                </div>
+            </div>
+            <div class="weather-reading">
+                <p id="weather-status" role="status" aria-live="polite" aria-atomic="true"></p>
+                <button id="weather-retry" type="button" hidden>Opnieuw proberen</button>
+            </div>
         </section>
     </main>
     <footer>
