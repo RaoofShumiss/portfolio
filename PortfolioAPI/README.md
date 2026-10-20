@@ -1,10 +1,13 @@
 # PortfolioAPI
 
 ASP.NET Core Web API op .NET 10, met een lagenstructuur voor controllers.
-De Entities, DTOs, Data en Services zijn uitgewerkt. Controllers en HTTP-routes
-moeten nog worden toegevoegd; Swagger toont daarom nog geen CRUD-endpoints.
+Controllers, Entities, DTOs, Data en Services zijn uitgewerkt.
+Swagger toont de tien CRUD-endpoints voor projecten en blogposts.
 
 ## Structuur
+
+- `Controllers`: ProjectsController en BlogsController verzorgen HTTP en
+  ontvangen hun service via constructorinjectie.
 
 - `Entities`: Project en Blog (de blogpost), met de velden uit de opdracht.
 - `DTOs`: Create- en Update-DTOs met validatie, en Response-DTOs met Id.
@@ -13,13 +16,27 @@ moeten nog worden toegevoegd; Swagger toont daarom nog geen CRUD-endpoints.
   Beide bieden asynchrone CRUD. De centrale ToResponse-mapping zet entiteiten
   om naar DTOs; leesqueries gebruiken AsNoTracking.
 
-Injecteer de service-interface in de toekomstige controller. GetByIdAsync en
+De controllers gebruiken de service-interfaces. GetByIdAsync en
 UpdateAsync geven null bij een onbekend id; DeleteAsync geeft dan false.
-De controller vertaalt die resultaten naar 404. Gebruik [ApiController] voor
+De controller vertaalt die resultaten naar 404. [ApiController] zorgt voor
 automatische DTO-validatie en 400-responses. De services valideren invoer ook
 bij rechtstreeks gebruik en gooien dan bij ongeldige invoer ValidationException.
 Id wordt door SQL Server gegenereerd. Datum en Publicatiedatum zijn verplicht
 in de invoer; gebruik een ISO 8601-datum, bijvoorbeeld 2026-11-03T00:00:00.
+
+## Endpoints
+
+| Methode | Projecten | Blogposts | Succes |
+| --- | --- | --- | --- |
+| GET | /api/projects | /api/blogs | 200 met een lijst DTOs |
+| GET | /api/projects/{id} | /api/blogs/{id} | 200 met een DTO |
+| POST | /api/projects | /api/blogs | 201 met een DTO en Location-header |
+| PUT | /api/projects/{id} | /api/blogs/{id} | 200 met de gewijzigde DTO |
+| DELETE | /api/projects/{id} | /api/blogs/{id} | 204 zonder inhoud |
+
+GET op id, PUT en DELETE geven 404 als het item niet bestaat.
+POST en PUT geven 400 bij ongeldige invoer. De controllers gebruiken geen
+DbContext of entiteiten rechtstreeks.
 
 ## Database en starten
 
