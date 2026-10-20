@@ -19,10 +19,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Project>(entity =>
         {
             entity.HasKey(project => project.Id);
-            entity.Property(project => project.Titel).IsRequired().HasMaxLength(200);
-            entity.Property(project => project.Beschrijving).IsRequired().HasMaxLength(5000);
-            entity.Property(project => project.Categorie).IsRequired().HasMaxLength(100);
-            entity.Property(project => project.GitHubUrl).IsRequired().HasMaxLength(2048);
+            entity.Property(project => project.Title).IsRequired().HasMaxLength(200);
+            entity.Property(project => project.Description).IsRequired().HasMaxLength(5000);
+            entity.Property(project => project.Category).IsRequired().HasMaxLength(100);
+            entity.PrimitiveCollection(project => project.Technologies)
+                .HasColumnType("nvarchar(max)").IsRequired();
         });
 
         modelBuilder.Entity<Blog>(entity =>

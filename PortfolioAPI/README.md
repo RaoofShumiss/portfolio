@@ -9,11 +9,11 @@ Swagger toont de tien CRUD-endpoints voor projecten en blogposts.
 - `Controllers`: ProjectsController en BlogsController verzorgen HTTP en
   ontvangen hun service via constructorinjectie.
 
-- `Entities`: Project en Blog (de blogpost), met de velden uit de opdracht.
+- `Entities`: Project met de inhoudsvelden uit script.js; Blog voor blogposts.
 - `DTOs`: Create- en Update-DTOs met validatie, en Response-DTOs met Id.
 - `Data`: AppDbContext met Projects en Blogs en de databaseconfiguratie.
 - `Services`: IProjectService/ProjectService en IBlogService/BlogService.
-  Beide bieden asynchrone CRUD. De centrale ToResponse-mapping zet entiteiten
+  Beide bieden asynchrone CRUD. De centrale DTO-mapping zet entiteiten
   om naar DTOs; leesqueries gebruiken AsNoTracking.
 
 De controllers gebruiken de service-interfaces. GetByIdAsync en
@@ -21,8 +21,37 @@ UpdateAsync geven null bij een onbekend id; DeleteAsync geeft dan false.
 De controller vertaalt die resultaten naar 404. [ApiController] zorgt voor
 automatische DTO-validatie en 400-responses. De services valideren invoer ook
 bij rechtstreeks gebruik en gooien dan bij ongeldige invoer ValidationException.
-Id wordt door SQL Server gegenereerd. Datum en Publicatiedatum zijn verplicht
-in de invoer; gebruik een ISO 8601-datum, bijvoorbeeld 2026-11-03T00:00:00.
+Id blijft een door SQL Server gegenereerd getal, niet de tekst-id uit script.js.
+Projecten gebruiken title, description, category en technologies.
+Technologies mag niet null zijn. Een lege lijst, één technologie of meerdere
+technologieën zijn toegestaan; de inhoud van de elementen wordt niet gevalideerd.
+De lijst wordt via EF Core als JSON in SQL Server opgeslagen. GitHubUrl en Datum horen niet
+meer bij het projectmodel. Dit wijkt af van het oorspronkelijke opdrachtmodel.
+Blogposts blijven titel, inhoud en publicatiedatum gebruiken.
+Publicatiedatum is verplicht; gebruik bijvoorbeeld 2026-11-03T00:00:00.
+
+Voor POST /api/projects kun je elk van deze objecten afzonderlijk gebruiken:
+
+```json
+{
+  "title": "Hotel Simulatie Systeem",
+  "description": "Een Java applicatie voor het simuleren van hotel operaties met gasten, liften en verschillende faciliteiten.",
+  "category": "java",
+  "technologies": ["Java", "Object-georiënteerd programmeren"]
+}
+```
+
+```json
+{
+  "title": "Portfolio Website",
+  "description": "Een responsieve portfolio website gebouwd met HTML5 en CSS3.",
+  "category": "web",
+  "technologies": ["HTML5", "CSS3", "Responsive Design"]
+}
+```
+
+PUT gebruikt dezelfde velden. GET en POST geven daarnaast het numerieke id terug.
+De website leest nog de vaste JavaScript-array; deze wijziging voegt geen fetch-koppeling toe.
 
 ## Endpoints
 

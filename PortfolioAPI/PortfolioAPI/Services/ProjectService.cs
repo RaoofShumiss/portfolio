@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PortfolioAPI.Data;
 using PortfolioAPI.DTOs;
@@ -16,29 +15,28 @@ public class ProjectService : IProjectService
         _context = context;
     }
 
-    // Centrale mapping voor queries en opgeslagen entiteiten.
-    private static readonly Expression<Func<Project, ProjectResponseDto>> ToResponse = item => new ProjectResponseDto
+    // Map na het inlezen zodat de JSON-lijst als gewone lijst beschikbaar is.
+    private static ProjectResponseDto MapToResponse(Project item) => new()
     {
         Id = item.Id,
-        Titel = item.Titel,
-        Beschrijving = item.Beschrijving,
-        Categorie = item.Categorie,
-        GitHubUrl = item.GitHubUrl,
-        Datum = item.Datum
+        Title = item.Title,
+        Description = item.Description,
+        Category = item.Category,
+        Technologies = item.Technologies.ToList()
     };
 
-    private static readonly Func<Project, ProjectResponseDto> MapToResponse = ToResponse.Compile();
-
-    public Task<List<ProjectResponseDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<List<ProjectResponseDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Projects.AsNoTracking().OrderBy(item => item.Id)
-            .Select(ToResponse).ToListAsync(cancellationToken);
+        var items = await _context.Projects.AsNoTracking().OrderBy(item => item.Id)
+            .ToListAsync(cancellationToken);
+        return items.Select(MapToResponse).ToList();
     }
 
-    public Task<ProjectResponseDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ProjectResponseDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Projects.AsNoTracking().Where(item => item.Id == id)
-            .Select(ToResponse).SingleOrDefaultAsync(cancellationToken);
+        var item = await _context.Projects.AsNoTracking()
+            .SingleOrDefaultAsync(item => item.Id == id, cancellationToken);
+        return item is null ? null : MapToResponse(item);
     }
 
     public async Task<ProjectResponseDto> CreateAsync(ProjectCreateDto dto, CancellationToken cancellationToken = default)
@@ -46,11 +44,10 @@ public class ProjectService : IProjectService
         Validator.ValidateObject(dto, new ValidationContext(dto), validateAllProperties: true);
         var item = new Project
         {
-            Titel = dto.Titel,
-            Beschrijving = dto.Beschrijving,
-            Categorie = dto.Categorie,
-            GitHubUrl = dto.GitHubUrl,
-            Datum = dto.Datum
+            Title = dto.Title,
+            Description = dto.Description,
+            Category = dto.Category,
+            Technologies = dto.Technologies.ToList()
         };
         _context.Projects.Add(item);
         await _context.SaveChangesAsync(cancellationToken);
@@ -66,11 +63,10 @@ public class ProjectService : IProjectService
         }
 
         Validator.ValidateObject(dto, new ValidationContext(dto), validateAllProperties: true);
-        item.Titel = dto.Titel;
-        item.Beschrijving = dto.Beschrijving;
-        item.Categorie = dto.Categorie;
-        item.GitHubUrl = dto.GitHubUrl;
-        item.Datum = dto.Datum;
+        item.Title = dto.Title;
+        item.Description = dto.Description;
+        item.Category = dto.Category;
+        item.Technologies = dto.Technologies.ToList();
         await _context.SaveChangesAsync(cancellationToken);
         return MapToResponse(item);
     }
