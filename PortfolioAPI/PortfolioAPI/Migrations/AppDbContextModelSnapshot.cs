@@ -60,10 +60,17 @@ namespace PortfolioAPI.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("Datum")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GitHubUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.PrimitiveCollection<string>("Technologies")
                         .IsRequired()

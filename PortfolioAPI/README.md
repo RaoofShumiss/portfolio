@@ -22,22 +22,29 @@ De controller vertaalt die resultaten naar 404. [ApiController] zorgt voor
 automatische DTO-validatie en 400-responses. De services valideren invoer ook
 bij rechtstreeks gebruik en gooien dan bij ongeldige invoer ValidationException.
 Id blijft een door SQL Server gegenereerd getal, niet de tekst-id uit script.js.
-Projecten gebruiken title, description, category en technologies.
+Projecten gebruiken title, description, category, technologies, gitHubUrl en datum.
 Technologies mag niet null zijn. Een lege lijst, één technologie of meerdere
 technologieën zijn toegestaan; de inhoud van de elementen wordt niet gevalideerd.
-De lijst wordt via EF Core als JSON in SQL Server opgeslagen. GitHubUrl en Datum horen niet
-meer bij het projectmodel. Dit wijkt af van het oorspronkelijke opdrachtmodel.
+De lijst wordt via EF Core als JSON in SQL Server opgeslagen.
+GitHubUrl en Datum zijn teruggebracht volgens de opdracht en zijn verplicht
+bij POST en PUT. Bestaande projecten zonder deze gegevens geven null terug;
+vul hun echte repository-URL en projectdatum aan via PUT. Daarom zijn deze
+twee databasekolommen nullable. Title, Description en Category zijn de
+Engelse namen voor Titel, Beschrijving en Categorie uit de opdracht.
 Blogposts blijven titel, inhoud en publicatiedatum gebruiken.
 Publicatiedatum is verplicht; gebruik bijvoorbeeld 2026-11-03T00:00:00.
 
-Voor POST /api/projects kun je elk van deze objecten afzonderlijk gebruiken:
+Voor POST /api/projects kun je elk van deze objecten afzonderlijk gebruiken.
+Vervang de voorbeeld-URL en voorbeeld-datum door de echte projectgegevens:
 
 ```json
 {
   "title": "Hotel Simulatie Systeem",
   "description": "Een Java applicatie voor het simuleren van hotel operaties met gasten, liften en verschillende faciliteiten.",
   "category": "java",
-  "technologies": ["Java", "Object-georiënteerd programmeren"]
+  "technologies": ["Java", "Object-georiënteerd programmeren"],
+  "gitHubUrl": "https://github.com/USERNAME/HOTEL-REPOSITORY",
+  "datum": "2026-11-03T00:00:00"
 }
 ```
 
@@ -46,7 +53,9 @@ Voor POST /api/projects kun je elk van deze objecten afzonderlijk gebruiken:
   "title": "Portfolio Website",
   "description": "Een responsieve portfolio website gebouwd met HTML5 en CSS3.",
   "category": "web",
-  "technologies": ["HTML5", "CSS3", "Responsive Design"]
+  "technologies": ["HTML5", "CSS3", "Responsive Design"],
+  "gitHubUrl": "https://github.com/USERNAME/PORTFOLIO-REPOSITORY",
+  "datum": "2026-11-03T00:00:00"
 }
 ```
 
