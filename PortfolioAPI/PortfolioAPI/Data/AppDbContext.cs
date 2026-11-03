@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
             entity.Property(project => project.Title).IsRequired().HasMaxLength(200);
             entity.Property(project => project.Description).IsRequired().HasMaxLength(5000);
             entity.Property(project => project.Category).IsRequired().HasMaxLength(100);
+            entity.Property(project => project.GitHubUrl).HasMaxLength(2048);
             entity.PrimitiveCollection(project => project.Technologies)
                 .HasColumnType("nvarchar(max)").IsRequired();
         });

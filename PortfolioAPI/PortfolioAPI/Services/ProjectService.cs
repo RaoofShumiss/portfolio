@@ -22,7 +22,9 @@ public class ProjectService : IProjectService
         Title = item.Title,
         Description = item.Description,
         Category = item.Category,
-        Technologies = item.Technologies.ToList()
+        Technologies = item.Technologies.ToList(),
+        GitHubUrl = item.GitHubUrl,
+        Datum = item.Datum
     };
 
     public async Task<List<ProjectResponseDto>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -47,7 +49,9 @@ public class ProjectService : IProjectService
             Title = dto.Title,
             Description = dto.Description,
             Category = dto.Category,
-            Technologies = dto.Technologies.ToList()
+            Technologies = dto.Technologies.ToList(),
+            GitHubUrl = dto.GitHubUrl,
+            Datum = dto.Datum
         };
         _context.Projects.Add(item);
         await _context.SaveChangesAsync(cancellationToken);
@@ -67,6 +71,8 @@ public class ProjectService : IProjectService
         item.Description = dto.Description;
         item.Category = dto.Category;
         item.Technologies = dto.Technologies.ToList();
+        item.GitHubUrl = dto.GitHubUrl;
+        item.Datum = dto.Datum;
         await _context.SaveChangesAsync(cancellationToken);
         return MapToResponse(item);
     }

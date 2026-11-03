@@ -11,4 +11,8 @@ public class Project
     public string Category { get; set; } = string.Empty;
 
     public List<string> Technologies { get; set; } = [];
+
+    public string? GitHubUrl { get; set; }
+
+    public DateTime? Datum { get; set; }
 }
