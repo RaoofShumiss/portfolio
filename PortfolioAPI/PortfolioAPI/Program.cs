@@ -2,6 +2,7 @@
 namespace PortfolioAPI
 {
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.AspNetCore.Identity;
     using PortfolioAPI.Data;
     using PortfolioAPI.Services;
 
@@ -14,9 +15,15 @@ namespace PortfolioAPI
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
+                options.User.RequireUniqueEmail = true)
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>();
+            builder.Services.AddAuthentication();
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("CanEdit", policy => policy.RequireRole("Editor", "Admin"));
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
-                        ?? throw new InvalidOperationException("DefaultConnection is missing.")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<IBlogService, BlogService>();
             builder.Services.AddOpenApi();
@@ -27,6 +34,12 @@ namespace PortfolioAPI
             {
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 await context.Database.MigrateAsync();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                foreach (var role in new[] { "Gast", "Editor", "Admin" })
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                }
             }
 
             // Configure the HTTP request pipeline.
@@ -39,6 +52,7 @@ namespace PortfolioAPI
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
