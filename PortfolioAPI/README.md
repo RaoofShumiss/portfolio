@@ -2,7 +2,7 @@
 
 ASP.NET Core Web API op .NET 10, met een lagenstructuur voor controllers.
 Controllers, Entities, DTOs, Data en Services zijn uitgewerkt.
-Swagger toont de tien CRUD-endpoints voor projecten en blogposts.
+Swagger toont de tien CRUD-endpoints en de registratie-, login- en logoutroutes.
 
 ## Structuur
 
@@ -75,6 +75,59 @@ De website leest nog de vaste JavaScript-array; deze wijziging voegt geen fetch-
 GET op id, PUT en DELETE geven 404 als het item niet bestaat.
 POST en PUT geven 400 bij ongeldige invoer. De controllers gebruiken geen
 DbContext of entiteiten rechtstreeks.
+
+## Authenticatie en autorisatie
+
+Identity bewaart gebruikers en gehashte wachtwoorden via EF Core in dezelfde
+SQL Server-database. `AppDbContext` erft van `IdentityDbContext<IdentityUser>`.
+De migratie `AddIdentity` maakt de Identity-tabellen; deze wordt net als de
+andere migraties bij het starten toegepast. De API maakt de rollen Gast,
+Editor en Admin aan als ze nog ontbreken, zonder standaardaccounts of wachtwoorden.
+
+Gebruik Swagger via HTTPS:
+
+1. Voer `POST /auth/register` uit met `email` en `password` in de JSON-body.
+   Kies zelf een wachtwoord (minimaal 6 tekens, hoofdletter, kleine letter,
+   cijfer en een niet-alfanumeriek teken). Bewaar het niet in de repository.
+   Registratie gebruikt `UserManager`, geeft 201 en kent uitsluitend Gast toe.
+   Ongeldige invoer of een bestaande gebruikersnaam geeft 400.
+2. Voer `POST /auth/login` uit met dezelfde velden. Succes geeft 200 en een
+   HttpOnly-authenticatiecookie; verkeerde inloggegevens geven 401.
+   Deze eigen loginroute gebruikt altijd cookies, dus `useCookies` is niet nodig.
+   Swagger stuurt de cookie automatisch mee bij volgende verzoeken.
+3. `POST /auth/logout` geeft 204 en verwijdert de aanmeldcookie.
+
+Alle GET-routes voor projecten en blogposts zijn publiek. POST, PUT en DELETE
+gebruiken de policy `CanEdit`, die expliciet Editor **of** Admin vereist.
+Zonder geldige cookie volgt 401; een aangemelde Gast krijgt 403.
+De controle gebeurt in de API voordat de controlleractie wordt uitgevoerd.
+
+### Lokaal Editor en Admin toekennen
+
+Registreer eerst afzonderlijke gebruikers voor Gast, Editor en Admin. Open
+`scripts/SetUserRole.sql` in SQL Server Management Studio, kies de lokale
+`PortfolioDb`, vul het e-mailadres en de gewenste rol in en voer het script uit.
+Herhaal dit voor de andere gebruiker met rol Admin. Een gewone gebruiker laat
+je Gast. Het script vervangt de huidige rol; Admin heeft dus zelfstandig toegang.
+Je kunt hetzelfde script met rol Gast gebruiken om schrijfrechten in te trekken.
+
+Het script wijzigt ook de security stamp. De API controleert deze bij ieder
+verzoek, waardoor een bestaande cookie na de wijziging 401 oplevert. Log opnieuw
+in via `/auth/login` om de nieuwe rol te gebruiken. Gebruik deze procedure ook
+bij een latere wijziging van gebruikersclaims/policies in de database.
+
+Controleer handmatig beide soorten inhoud: publieke GET (200), schrijven zonder
+cookie (401), schrijven als Gast (403), en POST/PUT/DELETE als Editor en als Admin
+(201/200/204 bij geldige gegevens en bestaande id's). Log tussen gebruikers uit.
+Een rolwijziging moet eerst 401 geven met de oude cookie en pas na login de nieuwe
+rechten. Een beheerroute en een afzonderlijk xUnit-project zijn nog niet toegevoegd;
+het testgedeelte van opdracht 4 wordt apart uitgewerkt.
+
+De cookie is Secure en SameSite=Strict: gebruik HTTPS. De latere SPA moet de
+cookie meesturen; bij een andere origin zijn expliciete CORS- en cookiekeuzes nodig.
+Geheimen horen in lokale configuratie of omgevingsvariabelen, nooit in Git.
+
+Bron: [Microsoft Learn over Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-10.0).
 
 ## Database en starten
 
