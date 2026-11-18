@@ -120,8 +120,7 @@ Controleer handmatig beide soorten inhoud: publieke GET (200), schrijven zonder
 cookie (401), schrijven als Gast (403), en POST/PUT/DELETE als Editor en als Admin
 (201/200/204 bij geldige gegevens en bestaande id's). Log tussen gebruikers uit.
 Een rolwijziging moet eerst 401 geven met de oude cookie en pas na login de nieuwe
-rechten. Een beheerroute en een afzonderlijk xUnit-project zijn nog niet toegevoegd;
-het testgedeelte van opdracht 4 wordt apart uitgewerkt.
+rechten. Een beheerroute is niet toegevoegd; roltoekenning blijft lokaal.
 
 De cookie is Secure en SameSite=Strict: gebruik HTTPS. De latere SPA moet de
 cookie meesturen; bij een andere origin zijn expliciete CORS- en cookiekeuzes nodig.
@@ -187,3 +186,53 @@ $env:ConnectionStrings__DefaultConnection = 'Server=YOUR_SERVER;Database=Portfol
 ```
 
 Referentie: [Microsoft Learn over DbContext en dependency injection](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/).
+
+## xUnit-tests met handgemaakte mocks
+
+`PortfolioAPI.Tests` staat in dezelfde solution. De aanpak volgt het
+MockLogger-voorbeeld uit les 7&8: een handgemaakte klasse implementeert de
+service-interface en wordt via constructorinjectie aan de controller gegeven.
+
+- `MockProjectService` implementeert `IProjectService`.
+- `MockBlogService` implementeert `IBlogService`.
+- `ProjectsControllerTests` en `BlogsControllerTests` testen de controllers
+  rechtstreeks met deze mocks.
+
+De mock geeft vooraf ingestelde resultaten terug en onthoudt welke id en DTO
+zijn doorgegeven. Elke test maakt een
+nieuwe mock en controller, zodat de tests geen gedeelde toestand of vaste
+uitvoervolgorde nodig hebben. De tests gebruiken `[Fact]`, `[Theory]`,
+`[InlineData]` en herkenbare Arrange-, Act- en Assert-stappen. In Act wordt
+steeds één controlleractie aangeroepen.
+
+### Uitvoeren
+
+Vanuit de map met `PortfolioAPI.slnx`:
+
+```powershell
+dotnet test PortfolioAPI.slnx
+```
+
+SQL Server en een draaiende API zijn niet nodig voor deze unit tests. Stop een
+nog draaiende lokale API voor het bouwen om een vergrendeld exe-bestand te voorkomen.
+
+### Wat wordt getest?
+
+Dezelfde scenario's staan in beide controller-testklassen:
+
+| Testnaam | Controle |
+| --- | --- |
+| `GetAll_ItemsAvailable_ReturnsOkWithItems` | OkObjectResult met de lijst uit de service |
+| `GetAll_NoItems_ReturnsOkWithEmptyList` | Een lege lijst geeft ook OkObjectResult |
+| `GetById_ExistingId_ReturnsOkWithItem` | Correct id aan service doorgegeven en juiste response; twee voorbeelden |
+| `GetById_UnknownId_ReturnsNotFound` | Een null-resultaat van de service wordt NotFoundResult |
+| `Create_ValidDto_PassesDtoAndReturnsCreatedItem` | DTO één keer doorgegeven, CreatedAtActionResult (201), response en route-id |
+| `Update_ExistingId_PassesDtoAndReturnsUpdatedItem` | Id en DTO één keer doorgegeven, OkObjectResult met serviceresultaat |
+| `Update_UnknownId_ReturnsNotFound` | Null van UpdateAsync wordt NotFoundResult |
+| `Delete_ServiceResult_ReturnsExpectedStatus` | True wordt 204, false wordt 404; juiste id en één serviceaanroep |
+
+Dit zijn 10 testgevallen per controller, dus 20 in totaal. De vijf acties van
+beide CRUD-controllers worden getest, inclusief alle expliciete if/else-paden.
+Bij schrijven controleren de tests de doorgegeven id en DTO, het aantal serviceaanroepen en het resultaat dat de controller teruggeeft.
+
+De gecontroleerde uitvoering slaagt met **20 tests**, 0 mislukt en 0 overgeslagen.
